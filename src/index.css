@@ -1,0 +1,658 @@
+/* Resets */
+*,
+*::before,
+*::after {
+  font-family: Arial;
+  box-sizing: border-box;
+}
+*:focus-visible {
+  outline: 3px dashed #ec2233;
+  outline-offset: 0;
+}
+html {
+  font: 62.5% / 1.15 sans-serif;
+}
+h1,
+h2 {
+  margin-bottom: 0;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+button {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  margin: 0;
+  overflow: visible;
+  padding: 0;
+  width: auto;
+}
+button::-moz-focus-inner {
+  border: 0;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+}
+button,
+input {
+  overflow: visible;
+}
+input[type="text"] {
+  border-radius: 15px
+}
+body {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background-image: url("assets/bg2.jpg");
+  background-repeat: no-repeat;
+  background-size: auto 100vh;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: whitesmoke;
+  color: #4d4d4d;
+  font:
+    1.6rem/1.25 Arial,
+    sans-serif;
+  width: 100%;
+}
+@media screen and (width >= 620px) {
+  body {
+    font-size: 1.9rem;
+    line-height: 1.31579;
+  }
+}
+/* End resets */
+/* Global styles */
+.form-group > input[type="text"] {
+  display: inline-block;
+  margin-top: 0.4rem;
+}
+.btn {
+  color: rgb(214, 214, 214);
+  background-color: rgb(0, 0, 0);
+  border: none;
+  cursor: pointer;
+  padding: 0.8rem 1rem 0.7rem;
+  text-transform: capitalize;
+  border-radius: 10px;
+}
+.btn.toggle-btn {
+  background-color: rgb(68, 68, 68);
+  /* border-color: rgb(61, 61, 61); */
+  color: rgb(196, 196, 196);
+  border-width: 1px;
+  border-radius: 5px;
+  border: 2px solid black;
+}
+.btn.toggle-btn[aria-pressed="true"] {
+  border-color: #ff2929;
+  box-shadow: 0px 0px 10px red;
+  text-decoration: underline;
+}
+.btn__danger {
+  background-color: hsla(0, 0%, 0%, 0.8);
+  border: 1px solid red;
+  color: white;
+  border-radius: 10px;
+}
+.btn__filter {
+  border-color: lightgrey;
+}
+.btn__primary {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 15px;
+}
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+}
+.btn-group > * {
+  flex: 1 1 49%;
+}
+.filters > button:not(:first-child){
+  width: calc(50% - 5px);
+  height: calc(50% - 5px);
+}
+.filters > button:first-child{
+  font-size: 4rem;
+  margin: 0;
+  height: calc(100% - 5px);
+  width: calc(50% - 5px);
+}
+.filters > button{
+  font-size: 3rem;
+  margin: 2px;
+}
+.filters{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  /* justify-content: normal; */
+  width: 100%;
+  height: 40%;
+  /* border: 2px solid white; */
+  color: white;
+}
+.btn-group > * + * {
+  margin-left: 0.8rem;
+}
+.count-down-btn{
+  display: flex;
+  position: absolute;
+  left: 50%;
+  top: 90%;
+  transform: translate(-50%, -100%);
+}
+.count-down-btn button{
+  color: white;
+  margin: 0px 5px;
+  padding: 10px;
+  border: 2px solid red;
+  border-radius: 5px;
+  background-color: black;
+  cursor: pointer;
+}
+.btn-disabled{
+  display: none;
+}
+.btn-enabled{
+  display: inline-block;
+}
+.label-wrapper {
+  flex: 0 0 100%;
+  margin: 0;
+  text-align: center;
+}
+.visually-hidden {
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  overflow: hidden;
+  position: absolute !important;
+  white-space: nowrap;
+  width: 1px;
+}
+[class*="stack"] > * {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.stack-small > * + * {
+  margin-top: 1.25rem;
+}
+.stack-large > * + * {
+  margin-top: 2.5rem;
+}
+@media screen and (width >= 550px) {
+  .stack-small > * + * {
+    margin-top: 1.4rem;
+  }
+  .stack-large > * + * {
+    margin-top: 2.8rem;
+  }
+}
+.stack-exception {
+  margin-top: 1.2rem;
+}
+/* End global styles */
+/* General app styles */
+.todoMain{
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  /* align-items: center; */
+  width: 80vw;
+  height: 100vh;
+  /* justify-content: space-between; */
+  margin: 0 auto;
+}
+.todoapp {
+  height: 40%;
+  width: 50%;
+  background: rgba(27, 27, 27, 0.6);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 2px 4px 0 rgb(0 0 0 / 20%),
+    0 2.5rem 5rem 0 rgb(0 0 0 / 10%);
+  margin: 0 0 20px 0;
+  padding: 1rem;
+  position: relative;
+  border-radius: 15px;
+}
+.todoapp2{
+  position: relative;
+  overflow: hidden;
+  width: 50%;
+  height: 50%;
+  background: rgba(27, 27, 27, 0.6);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 2px 4px 0 rgb(0 0 0 / 20%),
+    0 2.5rem 5rem 0 rgb(0 0 0 / 10%);
+  margin: 0 0 20px 0;
+  position: relative;
+  border-radius: 15px;
+}
+.todo-containers{
+  width: calc(50% - 20px);
+  height: 45%;
+  position: relative;
+  overflow: hidden;
+  background: rgba(27, 27, 27, 0.6);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 2px 4px 0 rgb(0 0 0 / 20%),
+    0 2.5rem 5rem 0 rgb(0 0 0 / 10%);
+  margin: 0 0 20px 20px;
+  position: relative;
+  border-radius: 15px; 
+}
+@media screen and (width < 850px) {
+  .todoMain{
+    flex-direction: row;
+    height: auto;
+  }
+  .todoapp, .todoapp2, .todoapp3 , .todo-containers{
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1rem;
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+.todo-containers h1{
+  line-height: 25px;
+  font-family: monospace;
+  font-size: 25px;
+  color: rgb(163, 162, 162);
+  text-align: center;
+  padding: 5px 0;
+  margin: 0;
+  top: 0%;
+  background-color: black;
+  border-bottom: 4px solid rgb(255, 255, 255);
+  border-image: radial-gradient( #d8d8d8, black) 1;;
+}
+.todo-containers ul{
+  position: relative;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  height: calc(100% - 39px);
+  width: 100%;
+  border-right: 4px solid black;
+  border-left: 4px solid black;
+  border-bottom: 4px solid black;
+  border-top: 1px solid hsla(0, 100%, 63%, 0);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-image: url("assets/vectorBG.jpg");
+  background-color: rgb(24, 24, 24);
+  background-blend-mode: overlay;
+  background-size: 150%;
+}
+/* .todo-containers ul > div{
+  visibility: visible;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(0, 0%, 100%, .2);
+  border: 3px solid rgb(151, 151, 151);
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 1;
+} */
+.todo-containers ul > div > svg{
+  position: relative;
+  width: 300px;
+  height: 300px;
+  /* background-color: black; */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.todo-containers ul > div > svg > polygon{
+  width: 100%;
+  height: 100%;
+  stroke-width: 10px;
+  stroke-linejoin: round;
+  stroke: hsla(0, 100%, 55%, 0.363);
+}
+.is-drag-over{
+  visibility: visible;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(0, 0%, 100%, .2);
+  border: 3px solid rgb(151, 151, 151);
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 1;
+}
+.is-not-drag-over{
+  visibility: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(0, 0%, 100%, .2);
+  border: 3px solid rgb(151, 151, 151);
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 1;
+}
+.count-down{
+  color: white;
+  font-size: auto;
+  margin: 0px;
+  width: 100%;
+  top: 45%;
+  position: absolute;
+  text-align: center;
+}
+.count-num{
+  font-family: monospace;
+  text-align: center;
+  text-shadow: 0px 0px 10px red;
+  color: rgb(255, 229, 229);
+  font-size: 6rem;
+  margin: 0px 2px;
+  vertical-align: middle;
+  width: 100px;
+  height: 100px;
+  background-color: black;
+  border-radius: 10px;
+  border-bottom: 2px solid gray;
+  border-right: 2px solid gray;
+}
+.todoapp2-heading{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(rgb(0, 0, 0), hsla(0, 0%, 0%, 0));
+}
+.todoapp2-heading2{
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  height: 20%;
+  background-color: rgb(0, 0, 0);
+  border-bottom: 3px solid rgb(194, 194, 194);
+  border-image: radial-gradient( #969696, black) 1;
+}
+.todoapp2-heading2 h2{
+  font-family: monospace;
+  color: rgb(163, 162, 162);
+  padding-bottom: 5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  height: 100%;
+}
+.todoapp3{
+  width: calc(50% - 1rem);
+  background: rgba(27, 27, 27, 0.6);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 2px 4px 0 rgb(0 0 0 / 20%),
+    0 2.5rem 5rem 0 rgb(0 0 0 / 10%);
+  margin: 0.5rem 0 4rem 0;
+  padding: 1rem;
+  position: relative;
+  border-radius: 15px;
+}
+/* @media screen and (width < 700px) {
+  .todoapp2, .todoapp3 {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (width >= 550px) {
+  .todoapp {
+    padding: 4rem;
+  }
+} */
+.todoapp > * {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 50rem;
+}
+.todoapp > form {
+  max-width: 100%;
+}
+.todoapp > h1 {
+  color: white;
+  display: block;
+  margin: 0;
+  margin-bottom: 1rem;
+  max-width: 100%;
+  text-align: center;
+}
+.label__lg {
+  color: white;
+  font-family: monospace;
+  line-height: 1.01567;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  padding: 0.8rem;
+  text-align: center;
+  border-top-right-radius: 10px;
+}
+.input__lg {
+  color: white;
+  text-shadow: 0px 0px 15px red;
+  background-color: hsla(0, 0%, 0%, 0.5);
+  border: none;
+  padding: 2rem;
+}
+.input__lg:focus-visible {
+  border-color: #4d4d4d;
+  box-shadow: inset 0 0 0 2px;
+}
+/* For Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+[class*="__lg"] {
+  display: inline-block;
+  font-size: 1.9rem;
+  width: 100%;
+}
+[class*="__lg"]:not(:last-child) {
+  margin-bottom: 1rem;
+}
+@media screen and (width >= 620px) {
+  [class*="__lg"] {
+    font-size: 2.4rem;
+  }
+}
+/* End general app styles */
+/* Todo item styles */
+.todo {
+  position: relative;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  border: 4px solid black;
+  flex-direction: row;
+  flex-wrap: wrap;
+  backdrop-filter: blur(3px);
+  background-color: hsla(0, 0%, 0%, .3);
+  /* border-image: radial-gradient(red, black) 1; */
+  border-radius: 10px;
+  pointer-events: all;
+}
+.pointer-disabled{
+  pointer-events: none;
+}
+.pointer-enabled{
+  pointer-events: auto;
+}
+.todo > * {
+  flex: 0 0 100%;
+}
+.todo-text {
+  border: 2px solid #565656;
+  min-height: 4.4rem;
+  padding: 0.4rem 0.8rem;
+  width: 100%;
+}
+.todo-label{
+  padding-left: 10px;
+  display: block;
+  border-radius: 15px;
+  background-color: black;
+  color: white;
+}
+.todo-text:focus-visible {
+  box-shadow: inset 0 0 0 2px;
+}
+/* End todo item styles */
+/* Checkbox styles */
+.c-cb {
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  clear: left;
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.25;
+  min-height: 44px;
+  padding-left: 40px;
+  position: relative;
+  left: -5px;
+}
+.c-cb > label::before,
+.c-cb > input[type="checkbox"] {
+  box-sizing: border-box;
+  height: 44px;
+  left: -2px;
+  top: -2px;
+  width: 44px;
+}
+.c-cb > input[type="checkbox"] {
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+  z-index: 1;
+}
+.c-cb > label {
+  /* color: rgb(255, 124, 124); */
+  cursor: pointer;
+  display: inline-block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin-bottom: 0;
+  padding: 8px 20px 5px;
+  touch-action: manipulation;
+  left: 10px;
+  border-radius: 10px;
+}
+.c-cb > label::before { 
+  /* custom checkbox using label with htmlFor = checkbox's id */
+  box-shadow: 0 0 20px red;
+  color: red;
+  background: rgb(41, 41, 41);
+  border: 2px solid currentColor;
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  left: 10px;
+  top: -5px;
+}
+.c-cb > input[type="checkbox"]:focus-visible + label::before {
+  border-width: 4px;
+  outline: 3px dashed #ec2222;
+}
+.c-cb > label::after {
+  color: rgb(255, 255, 255);
+  /* box-shadow: 0 0 20px red; */
+  background: transparent;
+  border: solid;
+  border-width: 0 0 5px 5px;
+  border-top-color: transparent;
+  box-sizing: content-box;
+  content: "";
+  height: 7px;
+  left: 19px;
+  opacity: 0;
+  position: absolute;
+  top: 9px;
+  transform: rotate(-45deg);
+  width: 18px;
+}
+.c-cb > input[type="checkbox"]:checked + label::after {
+  opacity: 1;
+}
+/* End checkbox styles */
+/* Star progress bar of count down component */
+.progress-bar{
+  position: relative;
+  box-sizing: initial;
+  width: 310px;
+  height: 20px;
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translateX(-50%);
+  background-color: black;
+  border-radius: 10px;
+  border: 5px solid black;
+  overflow: hidden;
+}
+.progress{
+  /* box-sizing: initial; */
+  position: relative;
+  left: -1%;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(201, 37, 37);
+  border-right: 3px solid rgb(255, 101, 101);
+  box-shadow: 3px 0px 30px rgb(255, 128, 128);
+  overflow: hidden;
+}
+.fractal-vid-bg{
+  filter: invert(1);
+  position: absolute;
+  top: -50%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  mix-blend-mode: multiply;
+  opacity: .7;
+}
+.fractal-vid-main-bg{
+  position: absolute;
+  height: 100%;
+  mix-blend-mode: overlay;
+  opacity: 0.2;
+}

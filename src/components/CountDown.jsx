@@ -53,7 +53,7 @@ function CountDown(){
 
     function begin(){
         timeSet.current = seconds * 1000 + minutes * 60 * 1000 + hours * 3600 * 1000;
-        console.log(timeSet.current);
+        // console.log(timeSet.current);
         setIsBeginActive(false);
         clearInterval(counter.current);
         currentTime.current = Date.now();
@@ -65,7 +65,7 @@ function CountDown(){
             const hours = Math.floor(elapsedTime / (3600 * 1000)) % 60;
             const progress = Number((elapsedTime / timeSet.current).toFixed(3));
             setProgress({width: `${progress * 102}%`});
-            console.log(seconds);
+            // console.log(seconds);
             // setTime(milliseconds);
             if(seconds >= 0){
                 setTimeNow(elapsedTimeBase);
@@ -98,7 +98,7 @@ function CountDown(){
                 const hours = Math.floor(elapsedTime / (3600 * 1000)) % 60;
                 const progress = Number((elapsedTime / timeSet.current).toFixed(3));
                 setProgress({width: `${progress * 102}%`});
-                console.log(progress);
+                // console.log(progress);
                 // setTime(milliseconds);
                 if(seconds >= 0){
                     setTimeNow(elapsedTimeBase);
@@ -131,7 +131,7 @@ function CountDown(){
     // }, [time])
 
     return(
-        <div>
+        <div className="count-down-container">
             <div className="progress-bar">
                 <div 
                     className="progress"

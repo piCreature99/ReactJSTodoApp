@@ -1,5 +1,5 @@
 function FilterButton(props){
-    console.log(props.name);
+    // console.log(props.name);
     return (
         <button 
         type="button" 

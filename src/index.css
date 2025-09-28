@@ -94,7 +94,7 @@ body {
 .btn.toggle-btn {
   background-color: rgb(68, 68, 68);
   /* border-color: rgb(61, 61, 61); */
-  color: rgb(196, 196, 196);
+  color: rgb(255, 255, 255);
   border-width: 1px;
   border-radius: 5px;
   border: 2px solid black;
@@ -126,7 +126,7 @@ body {
 .btn-group > * {
   flex: 1 1 49%;
 }
-.filters > button:not(:first-child){
+/* .filters > button:not(:first-child){
   width: calc(50% - 5px);
   height: calc(50% - 5px);
 }
@@ -135,18 +135,20 @@ body {
   margin: 0;
   height: calc(100% - 5px);
   width: calc(50% - 5px);
-}
+} */
 .filters > button{
-  font-size: 3rem;
+  font-size: 1.7rem;
   margin: 2px;
 }
 .filters{
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  flex-shrink: 0;
+  justify-content: center;
+  /* flex-direction: column; */
+  /* flex-wrap: wrap; */
   /* justify-content: normal; */
   width: 100%;
-  height: 40%;
+  height: auto;
   /* border: 2px solid white; */
   color: white;
 }
@@ -157,7 +159,7 @@ body {
   display: flex;
   position: absolute;
   left: 50%;
-  top: 90%;
+  top: 100%;
   transform: translate(-50%, -100%);
 }
 .count-down-btn button{
@@ -176,7 +178,7 @@ body {
   display: inline-block;
 }
 .label-wrapper {
-  flex: 0 0 100%;
+  /* flex: 0 0 100%; */
   margin: 0;
   text-align: center;
 }
@@ -223,7 +225,7 @@ body {
   margin: 0 auto;
 }
 .todoapp {
-  height: 40%;
+  height: 45%;
   width: 50%;
   background: rgba(27, 27, 27, 0.6);
   backdrop-filter: blur(10px);
@@ -249,11 +251,12 @@ body {
   position: relative;
   border-radius: 15px;
 }
-.todo-containers{
+.todo-containers, .todo-containers-2{
   width: calc(50% - 20px);
   height: 45%;
   position: relative;
-  overflow: hidden;
+  overflow: scroll;
+  scrollbar-width: none;
   background: rgba(27, 27, 27, 0.6);
   backdrop-filter: blur(10px);
   box-shadow:
@@ -263,12 +266,19 @@ body {
   position: relative;
   border-radius: 15px; 
 }
+.todo-containers-2{
+  width: 50%;
+  margin: 0 0 20px 0px
+}
+/* .todo-containers-2{
+  width: 300px;
+} */
 @media screen and (width < 850px) {
   .todoMain{
     flex-direction: row;
     height: auto;
   }
-  .todoapp, .todoapp2, .todoapp3 , .todo-containers{
+  .todoapp, .todoapp2, .todoapp3 , .todo-containers, .todo-containers-2{
     width: 100%;
     height: 500px;
     margin-bottom: 1rem;
@@ -276,7 +286,7 @@ body {
     margin-left: 0;
   }
 }
-.todo-containers h1{
+.todo-containers h1, .todo-containers-2 h1{
   line-height: 25px;
   font-family: monospace;
   font-size: 25px;
@@ -289,7 +299,7 @@ body {
   border-bottom: 4px solid rgb(255, 255, 255);
   border-image: radial-gradient( #d8d8d8, black) 1;;
 }
-.todo-containers ul{
+.todo-containers ul, .todo-containers-2 ul{
   position: relative;
   top: 0;
   margin: 0;
@@ -356,12 +366,18 @@ body {
   pointer-events: none;
   z-index: 1;
 }
+.count-down-container{
+  position: relative;
+  /* border: 1px solid white; */
+  height: 35%;
+  margin: 0px;
+}
 .count-down{
   color: white;
   font-size: auto;
   margin: 0px;
   width: 100%;
-  top: 45%;
+  top: 25%;
   position: absolute;
   text-align: center;
 }
@@ -373,8 +389,8 @@ body {
   font-size: 6rem;
   margin: 0px 2px;
   vertical-align: middle;
-  width: 100px;
-  height: 100px;
+  width: 75px;
+  height: 75px;
   background-color: black;
   border-radius: 10px;
   border-bottom: 2px solid gray;
@@ -492,7 +508,7 @@ input[type="number"] {
 }
 /* End general app styles */
 /* Todo item styles */
-.todo {
+.todo, .todoInactive{
   position: relative;
   margin: 10px;
   padding: 10px;
@@ -504,7 +520,17 @@ input[type="number"] {
   background-color: hsla(0, 0%, 0%, .3);
   /* border-image: radial-gradient(red, black) 1; */
   border-radius: 10px;
-  pointer-events: all;
+}
+.todoInactive{
+ visibility: collapse;
+}
+.todo-drag-handle{
+  position: absolute;
+  width: 95%;
+  height: 90%;
+  z-index: 0;
+  /* pointer-events: none; */
+  /* background-color: white; */
 }
 .pointer-disabled{
   pointer-events: none;
@@ -514,6 +540,10 @@ input[type="number"] {
 }
 .todo > * {
   flex: 0 0 100%;
+}
+.todo button, .todo input{
+  position: relative;
+  z-index: 1;
 }
 .todo-text {
   border: 2px solid #565656;
@@ -618,10 +648,10 @@ input[type="number"] {
   position: relative;
   box-sizing: initial;
   width: 310px;
-  height: 20px;
+  height: 10px;
   position: absolute;
   left: 50%;
-  top: 30%;
+  top: 10%;
   transform: translateX(-50%);
   background-color: black;
   border-radius: 10px;

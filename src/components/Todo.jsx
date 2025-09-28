@@ -1,24 +1,57 @@
 import { useEffect, useRef, useState } from 'react';
+import { useDraggable, DragOverlay} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {CSS} from '@dnd-kit/utilities';
 
 function Todo(props) {
   const [isEditing, setEditing] = useState(false);
   const [newName, setNewName] = useState("");
+  // const {attributes, listeners, setNodeRef, transform, active} = useDraggable({
+  //       id: props.id,
+  //   });
+  // const [currentProgress, setCurrentProgress] = useState(1);
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({id: props.id});
   const editFieldRef = useRef(null);
   const editButtonRef = useRef(null);
   const wasEditing = usePrevious(isEditing);
-  console.log(wasEditing);
-  function handleDragStart(e){
-    const selectedIds = [props.id, props.filterName];
-    e.dataTransfer.setData("text/plain", JSON.stringify(selectedIds));
-    setTimeout(() => {
-      props.setPointerStateAll(true); // go back to the app to set the pointer state of the container
-    }, 1);
-    // console.log(props.name);
+  // console.log(props.isDraggingAndID[0]);
+
+    const style = {
+    // We only apply the transform and transition to the overlay or if not dragging
+    transform: !props.isOverlay ? CSS.Transform.toString(transform) : undefined, 
+    transition: !props.CSSisOverlay ? transition : undefined,
+    position: 'relative',
+    // <-- NEW: The original item becomes transparent when being dragged
+    opacity: isDragging ? 0 : 1,
+    zIndex: isDragging ? 10 : 0,
+    // The overlay should be fixed to the mouse pointer with a high z-index
+    // The original item should just disappear when dragging starts
+    // backgroundColor: 'white',
+    boxShadow: isDragging ? '0px 10px 30px rgba(0, 0, 0, 0.2)' : '0px 5px 15px rgba(0, 0, 0, 0.1)',
+    cursor: isDragging ? 'grabbing' : 'grab',
   };
-  function handleDragEnd(){
-    props.setPointerStateAll(false);
-    console.log("drag end fired")
-  }
+  // console.log(wasEditing);
+  // function handleDragStart(e){
+  //   const selectedIds = [props.id, props.filterName];
+  //   e.dataTransfer.setData("text/plain", JSON.stringify(selectedIds));
+  //   // console.log(props.name);
+  // };
+  // function handleDragEnd(){
+  //   console.log("drag end fired")
+  // }
   // console.log(editFieldRef.current);
   useEffect(() => { // run after the main render
     // console.log("side effect");
@@ -54,6 +87,11 @@ function Todo(props) {
       setEditing(false);
     }
   }
+
+  // useState and useRef() reset across remounting, in this case the child is remounted through parent, so the value reset
+  function handleToggle(){
+    props.toggleTaskProgress(props.id, props.progress);
+  }
   const editingTemplate = (
     <form className="stack-small" onSubmit={handleSubmit}>
       <div className="form=group">
@@ -82,8 +120,9 @@ function Todo(props) {
         <input 
         id={props.id}
         type="checkbox"
-        defaultChecked={props.completed}
-        onChange={() => props.toggleTaskCompleted(props.id)} 
+        defaultChecked={props.progress === 0 ? false : props.progress === 1 ? false : true}
+        // onChange={() => props.toggleTaskProgress(props.id)} 
+        onChange={handleToggle}
         />
         <label className="todo-label" htmlFor={props.id}>
           {props.name}
@@ -113,14 +152,27 @@ function Todo(props) {
       </div>
     </div>
   );
+  // console.log(props.isDraggingAndID[1]);
+  // console.log(props.isDraggingAndID[0]);
+  // const className = (props.isDraggingAndID[0] === true && props.isDraggingAndID[1] === props.id ? 'todo' : 'todo');
+  // console.log(props.isDraggingAndID[0]);
   return (
-     <li 
-     // disable pointer when on drag start, making sure the drag leave not fired when hover above child element
-     className={`todo ${props.pointerState ? 'pointer-disabled' : 'pointer-enabled'}`}
-     draggable={true}
-     onDragStart={handleDragStart}
-     onDragEnd={handleDragEnd}
-     >{isEditing ? editingTemplate : viewTemplate}</li>
+          <li
+      // disable pointer when on drag start, making sure the drag leave not fired when hover above child element
+      className={'todo'}
+      style={style} 
+      ref={setNodeRef} 
+
+      /* //  draggable={true}
+      //  onDragStart={handleDragStart}
+      //  onDragEnd={handleDragEnd} */
+      >
+        {isEditing ? editingTemplate : viewTemplate}
+        <div className='todo-drag-handle'
+        {...listeners} 
+        {...attributes}
+        ></div> 
+      </li>
   );
 }
 

@@ -1,0 +1,5 @@
+How to integrate firebase into my todo app?? 
+1. You app will now display data from firebase database instead of 
+generating new array every page-refresh
+2. Make use of query function, get Docs, delete Docs, add Docs .... 
+3. Automatic seamless update for database (auto update database every 5 seconds in the background without slowing user interaction); 

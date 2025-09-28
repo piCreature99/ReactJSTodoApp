@@ -6,25 +6,42 @@ import CountDown from "./components/CountDown";
 import backgroundVid from "./assets/fractal.mp4";
 import { useState, useRef, useEffect } from "react";
 import { nanoid } from "nanoid";
+import {
+  DndContext,
+  closestCenter,
+  pointerWithin,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay, // <-- NEW: Import DragOverlay
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { collection, doc, query, orderBy, getDocs, addDoc, deleteDoc, updateDoc} from 'firebase/firestore';
+import { db } from './firebaseConfig.js';
 
 const FILTER_MAP = {
   All: () => true, //implicit return
-  Active: (task) => !task.completed,
-  Completed: (task) => task.completed,
+  Active: (task) => task.progress === 0,
+  Completed: (task) => task.progress === 2,
+  inProgress: (task) => task.progress === 1,
 };
-// Object.keys() method to collect an array of FILTER_NAMES:
 const FILTER_NAMES = Object.keys(FILTER_MAP);
 
 function App(props) {
-  // First of all, we need to put name into an object that has the 
-  // same structure as our existing tasks. Inside of the addTask() function, we will make a newTask object to add to the array.
   const [tasks, setTasks] = useState(props.tasks);
   const [filter, setFilter] = useState("All");
-  const [pointerDisabled, setPointerDisabled] = useState(false);
-
-  function setPointerStateAll(state){
-    setPointerDisabled(state);
-  }
+  const [currentTodo, setCurrentTodo] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [activeId, setActiveId] = useState("");
+  const [currentProgress, setCurrentProgress] = useState("Active");
+  const [defaultProgress, setDefaultProgress] = useState("Active");
 
   const filterList = FILTER_NAMES.map((name) => (
     <FilterButton 
@@ -37,23 +54,26 @@ function App(props) {
   const filterContainer = FILTER_NAMES.map((name) => {
     if(name !== "All"){
       return <TodoContainers
-      setPointerStateAll={setPointerStateAll}
-      pointerState={pointerDisabled} 
+      isDraggingAndID={[isDragging, activeId]}
+      id={name}
       isActive={filter} 
+      key={name}
       filterName={name} 
       tasks={tasks} 
       filterMap={FILTER_MAP}
-      toggleTaskCompleted={toggleTaskCompleted}
+      toggleTaskProgress={toggleTaskProgress}
       deleteTask={deleteTask}
       editTask={editTask}
       />
     }
   });
   // You should always pass a unique key to anything you render with iteration.
-  function toggleTaskCompleted(id){ // we need to synchronize the browser with our data because the completed value still stay true
+  // the useState only keep values across re-render of the component it's declared in
+  function toggleTaskProgress(id, progress){ // we need to synchronize the browser with our data because the completed value still stay true
+    progress = (progress + 1) % 3;
     const updatedTasks = tasks.map((task) => {
       if(id === task.id){
-        return {...task, completed: !task.completed}; // the right completed overites the completed value in the ...task
+        return {...task, progress: progress}; // the right completed overites the completed value in the ...task
       }
       return task;
     });
@@ -76,12 +96,11 @@ function App(props) {
     const remainingTasks = tasks.filter((task) => id !== task.id);
     setTasks(remainingTasks);
   }
-  // console.log(tasks[0]);
   const taskLength = tasks?.filter(FILTER_MAP[filter]).length;
   const tasksNoun = taskLength !== 1 ? "tasks" : "task";
   const headingText = `${taskLength} ${tasksNoun} remaining`;
   function addTask(name){
-    const newTask = {id: `todo-${nanoid()}`, name, completed: false}
+    const newTask = {id: `todo-${nanoid()}`, name, progress: 0}
     setTasks([...tasks, newTask]);
   }
 
@@ -89,9 +108,6 @@ function App(props) {
   const prevTaskLength = usePrevious(tasks.length);
 
   useEffect(() => {
-    if (tasks.length < prevTaskLength){
-      listHeadingRef.current.focus();
-    }
   }, [tasks.length, prevTaskLength]);
 
   function usePrevious(value){
@@ -130,38 +146,117 @@ function App(props) {
       document.body.removeChild(videoRef.current);
     };
   }, []); 
+  
+  const progressList = ["Active", "inProgress", "Completed"]
+
+  function handleDragEnd(event){
+    const { active, over } = event;
+      
+    // const currentData = active.data.current;
+    if(over){
+      const progress = currentProgress === "Active" ? 0 :
+      currentProgress === "inProgress" ? 1 : 2;  
+      toggleTaskProgress(active.id, progress - 1);
+    }
+    // console.log(progress);
+
+    if (over && active.id !== over.id) {
+      setTasks((currentTasks) => {
+        const oldIndex = currentTasks.findIndex(task => task.id === active.id);
+        const newIndex = currentTasks.findIndex(task => task.id === over.id);
+        return arrayMove(currentTasks, oldIndex, newIndex);
+      });
+    }
+    // console.log(over.id);
+    // console.log(active.id);
+    setCurrentTodo(null);
+    setActiveId(null);
+    setIsDragging(false);
+  } 
+
+  function handleDragStart(event){
+    setActiveId(event.active.id);
+    setIsDragging(true);
+    const container = tasks.find(task => task.id === event.active.id);
+    setDefaultProgress(progressList[container.progress]);
+    setCurrentProgress(progressList[container.progress]);
+    // Find the complete task data object for the active item
+    const activeTask = tasks.find(task => task.id === event.active.id);
+    // console.log(event);
+  // If the task is found, set the currentTodo state with its full data
+    if (activeTask) {
+      setCurrentTodo(
+        <Todo
+          id={activeTask.id}
+          name={activeTask.name}
+          progress={activeTask.progress}
+          // Pass any other necessary props
+          isOverlay={true}// Pass custom props if needed
+        />
+      );
+    }
+  }
+
+  function handleDragCancel(){
+    console.log("drag cancel");
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  )
+
+  function handleDragOver(event){
+    if(event.over && progressList.includes(event.over.id)){
+      setCurrentProgress(event.over.id);
+      // console.log(event.over);
+    }
+  }
+  
   //compare a number to an unidentified value always return false
   return (
-    <div className="todoMain">
-      {/* <video className="fractal-vid-main-bg" src={backgroundVid} autoPlay={true} muted loop></video>    */}
-      <div className="todoapp stack-large">
-        <h1>TodoMatic</h1>
-        <Form onSubmit={addTask} /> 
-        {/* naming convention onSubmit. "on" prefix tells us that the prop is a callback function */}
-        <div className="filters stack-exception">
-        {filterList}
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={(pointerWithin)}
+      onDragEnd={handleDragEnd}
+      onDragStart={handleDragStart}
+      onDragCancel={handleDragCancel}
+      onDragOver={handleDragOver}
+    >
+      <SortableContext
+        items={tasks.map((task) => task.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="todoMain">
+          <div className="todoapp stack-large">
+            <h1>TodoMatic</h1>
+              <Form onSubmit={addTask} /> 
+            <div className="filters stack-exception">
+              {filterList}
+            </div>
+            <CountDown />
+          </div>
+          {filterContainer}
         </div>
-        
-      </div>
-      <div className="todoapp2 stack-large">
-          <div className="todoapp2-heading">
-          </div>
-          <div className="todoapp2-heading2">
-            <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>{headingText.toLocaleUpperCase()}</h2>
-          </div>
-          <CountDown />
-      </div>
-      {filterContainer}
-      {/* <div className="todoapp3 stack-large">
-        <ul
-          role="list"
-          className="todo-list stack-large stack-exception"
-          aria-labelledby="list-heading">
-          {taskList}
-        </ul>
-      </div> */}
-    </div>
+      </SortableContext>
+      <DragOverlay>
+          {currentTodo ? (
+            currentTodo) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
 
 export default App;
+
+// Detect whether or not the item is in the container, when
+// inside the container allow normal array sorting, outside of
+// the container allows dropping, and sorting when re-enter a 
+// container
+
+// At beginning, ignore the id if it's the progress id, save the
+// last item's over.id, update the item's over id only when
+// the pointer is moved to another item within that container
+// on container leave
